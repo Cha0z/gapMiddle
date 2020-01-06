@@ -45,4 +45,32 @@ public class Student {
     public void setEducation(String education) {
         this.education = education;
     }
+
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "name='" + name + '\'' +
+                ", birthday=" + birthday +
+                ", education='" + education + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Student student = (Student) o;
+
+        if (!name.equals(student.name)) return false;
+        if (!birthday.equals(student.birthday)) return false;
+        return education.equals(student.education);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
 }

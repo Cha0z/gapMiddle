@@ -7,6 +7,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -20,35 +21,35 @@ import static org.junit.Assert.assertEquals;
 public class XmlServiceTest {
 
     private XmlService service = new XmlService();
-    private StudentGroup expected;
-    private List<Student> students;
+    private StudentGroup expectedGroup;
+    private List<Student> expectedStudents;
     private static final String SOURCE = "src/main/resources/static/student.xml";
 
 
     @ParameterizedTest
     @ValueSource(ints = {0, 1})
     public void testXmlToOBj(Integer number) {
-        expected = new StudentGroup();
-        expected.setGroupName("TK");
-        students = Arrays.asList(new Student("Alex", LocalDate.parse("1997-08-16"), "master"),
+        expectedGroup = new StudentGroup();
+        expectedGroup.setGroupName("TK");
+        expectedStudents = Arrays.asList(new Student("Alex", LocalDate.parse("1997-08-16"), "master"),
                 new Student("John", LocalDate.parse("1789-01-09"), "bachelor"));
-        expected.setStudents(students);
+        expectedGroup.setStudents(expectedStudents);
 
 
         StudentGroup actual = service.xmlToObj().get(); //будет время - поправить, в тесте не критично
-        assertEquals(expected.getGroupName(), actual.getGroupName());
-        assertEquals(students.get(number).getBirthday(), actual.getStudents().get(number).getBirthday());
-        assertEquals(students.get(number).getName(), actual.getStudents().get(number).getName());
-        assertEquals(students.get(number).getEducation(), actual.getStudents().get(number).getEducation());
+        assertEquals(expectedGroup.getGroupName(), actual.getGroupName());
+        assertEquals(expectedStudents.get(number).getBirthday(), actual.getStudents().get(number).getBirthday());
+        assertEquals(expectedStudents.get(number).getName(), actual.getStudents().get(number).getName());
+        assertEquals(expectedStudents.get(number).getEducation(), actual.getStudents().get(number).getEducation());
     }
 
     @Test
     public void testObjToXml() {
-        expected = new StudentGroup();
-        expected.setGroupName("TK");
-        students = Arrays.asList(new Student("Alex", LocalDate.parse("1997-08-16"), "master"),
+        expectedGroup = new StudentGroup();
+        expectedGroup.setGroupName("TK");
+        expectedStudents = Arrays.asList(new Student("Alex", LocalDate.parse("1997-08-16"), "master"),
                 new Student("John", LocalDate.parse("1789-01-09"), "bachelor"));
-        expected.setStudents(students);
+        expectedGroup.setStudents(expectedStudents);
         StringBuilder textFromFile = new StringBuilder("");
         try (BufferedReader reader = new BufferedReader(new FileReader(SOURCE))) {
             textFromFile.append(reader.readLine());
@@ -65,19 +66,50 @@ public class XmlServiceTest {
     }
 
 
-    @Test
-    public void testXmlToObjWithDom() {
-        expected = new StudentGroup();
-        expected.setGroupName("TK");
-        students = Arrays.asList(new Student("Alex", LocalDate.parse("1997-08-16"), "master"),
-                new Student("John", LocalDate.parse("1789-01-09"), "bachelor"));
-        expected.setStudents(students);
+    @ParameterizedTest
+    @ValueSource(ints = {0, 1})
+    public void testXmlToObjWithDom(Integer number) throws ParserConfigurationException {
 
+        expectedStudents = Arrays.asList(new Student("Alex", LocalDate.parse("1997-08-16"), "master"),
+                new Student("John", LocalDate.parse("1789-01-09"), "bachelor"));
+
+
+        List<Student> actual = fillListWtihDom();
+        assertEquals(expectedStudents.get(number), actual.get(number));
+
+
+    }
+    @ParameterizedTest
+    @ValueSource(ints = {0, 1})
+    public void testXmlToObjWithSax(Integer number) throws ParserConfigurationException {
+
+        expectedStudents = Arrays.asList(new Student("Alex", LocalDate.parse("1997-08-16"), "master"),
+                new Student("John", LocalDate.parse("1789-01-09"), "bachelor"));
+
+
+        List<Student> actual = fillListWtihSax();
+        assertEquals(expectedStudents.get(number), actual.get(number));
+
+
+    }
+
+    private List<Student> fillListWtihDom() throws ParserConfigurationException {
 
         try {
-            service.xmlToObjWithDom();
+            return service.xmlToObjWithDom();
         } catch (IOException | SAXException e) {
             e.printStackTrace();
+            return null;
+        }
+    }
+
+    private List<Student> fillListWtihSax() throws ParserConfigurationException {
+
+        try {
+            return service.xmlToObjWithDom();
+        } catch (IOException | SAXException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }
