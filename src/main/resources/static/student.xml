@@ -2,15 +2,15 @@
 <studentGroup>
     <groupName>TK</groupName>
     <students>
-    <student>
-        <name>Alex</name>
-        <birthday>1997-08-16</birthday>
-        <education>master</education>
-    </student>
-    <student>
-        <name>John</name>
-        <birthday>1789-01-09</birthday>
-        <education>bachelor</education>
-    </student>
+        <student>
+            <name>Alex</name>
+            <birthday>1997-08-16</birthday>
+            <education>master</education>
+        </student>
+        <student>
+            <name>John</name>
+            <birthday>1789-01-09</birthday>
+            <education>bachelor</education>
+        </student>
     </students>
 </studentGroup>

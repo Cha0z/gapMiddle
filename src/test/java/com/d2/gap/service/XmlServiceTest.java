@@ -5,9 +5,12 @@ import com.d2.gap.model.StudentGroup;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -79,6 +82,7 @@ public class XmlServiceTest {
 
 
     }
+
     @ParameterizedTest
     @ValueSource(ints = {0, 1})
     public void testXmlToObjWithSax(Integer number) throws ParserConfigurationException {
@@ -93,10 +97,18 @@ public class XmlServiceTest {
 
     }
 
+    @Test
+    public void XpathTest() throws XPathExpressionException, SAXException, ParserConfigurationException {
+        XmlService service = new XmlService();
+        String expr = "/studentGroup/students/student";
+        NodeList nodeSet = (NodeList) service.readXmlWithXpath(expr, XPathConstants.NODESET);
+        assertEquals(2, nodeSet.getLength());
+    }
+
     private List<Student> fillListWtihDom() throws ParserConfigurationException {
 
         try {
-            return service.xmlToObjWithDom();
+            return service.readStudentFromXmlWithDom();
         } catch (IOException | SAXException e) {
             e.printStackTrace();
             return null;
@@ -106,10 +118,12 @@ public class XmlServiceTest {
     private List<Student> fillListWtihSax() throws ParserConfigurationException {
 
         try {
-            return service.xmlToObjWithDom();
+            return service.readStudentFromXmlWithDom();
         } catch (IOException | SAXException e) {
             e.printStackTrace();
             return null;
         }
     }
+
+
 }
