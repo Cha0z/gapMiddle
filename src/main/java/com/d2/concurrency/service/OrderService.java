@@ -1,12 +1,8 @@
 package com.d2.concurrency.service;
 
-import org.springframework.stereotype.Component;
+import com.d2.concurrency.model.TestOrder;
 
-@Component
-public class OrderService {
+public interface OrderService {
 
-
-
-
-
+    void sendOrder(TestOrder order);
 }
