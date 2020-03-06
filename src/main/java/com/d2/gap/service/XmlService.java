@@ -26,61 +26,60 @@ public class XmlService {
     private static final String SOURCE = "src/main/resources/static/student.xml";
 
     public Optional<StudentGroup> xmlToObj() {
-        File file = new File(SOURCE);
-        return unpackXmlToObjWithJaxb(file);
+        return unpackXmlToObjWithJaxb(new File(SOURCE));
     }
 
 
     public List<Student> xmlToObjWithDom() throws IOException, SAXException, ParserConfigurationException {
+        return fillStudentList(
+                getDomDocument(SOURCE).getElementsByTagName("student")
+        );
+    }
+
+    private Document getDomDocument(String source) throws ParserConfigurationException, SAXException, IOException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
-
-
-        Document document = builder.parse(new File(SOURCE));
-
-
-        Element root = document.getDocumentElement();
-
-
-        NodeList nList = document.getElementsByTagName("student");
-
-        return fillStudentList(nList);
-
-
+        return builder.parse(new File(source));
     }
 
     private List<Student> fillStudentList(NodeList nList) {
         List<Student> studentList = new ArrayList<>();
         for (int i = 0; i < nList.getLength(); i++) {
-            Element student = (Element) nList.item(i);
-
-            studentList.add(new Student(
-                    student.getElementsByTagName("name").item(0).getTextContent(),
-                    LocalDate.parse(student.getElementsByTagName("birthday").item(0).getTextContent()),
-                    student.getElementsByTagName("education").item(0).getTextContent()
-            ));
-
+            addStudentToList(studentList, (Element) nList.item(i));
         }
         return studentList;
     }
 
+    private void addStudentToList(List<Student> studentList, Element studentElement) {
+        studentList.add(createNewStudent(studentElement));
+    }
+
+    private Student createNewStudent(Element studentElement) {
+        return new Student(
+                studentElement.getElementsByTagName("name").item(0).getTextContent(),
+                LocalDate.parse(studentElement.getElementsByTagName("birthday").item(0).getTextContent()),
+                studentElement.getElementsByTagName("education").item(0).getTextContent()
+        );
+    }
+
     public List<Student> xmlToObjWithSax() throws ParserConfigurationException, SAXException, IOException {
+        return parseXmlToList(getSaxParser());
+    }
+
+    private SAXParser getSaxParser() throws ParserConfigurationException, SAXException {
         SAXParserFactory factory = SAXParserFactory.newInstance();
-        SAXParser parser = factory.newSAXParser();
+        return factory.newSAXParser();
+    }
 
+    private List<Student> parseXmlToList(SAXParser parser) throws SAXException, IOException {
         List<Student> studentList = new ArrayList<>();
-
-        XmlSaxHandler handler = new XmlSaxHandler(studentList);
-        parser.parse(new File(SOURCE), handler);
-
+        parser.parse(new File(SOURCE), new XmlSaxHandler(studentList));
         return studentList;
     }
-
-    public static void main(String[] args) throws IOException, SAXException, ParserConfigurationException {
-        XmlService service = new XmlService();
-        service.xmlToObjWithSax();
-    }
-
+//    public static void main(String[] args) throws IOException, SAXException, ParserConfigurationException {
+//        XmlService service = new XmlService();
+//        service.xmlToObjWithSax();
+//    }
 
     public String ObjToXmlWithJaxb(StudentGroup studentGroup) {
         return packObjToXml(studentGroup).get();
@@ -89,26 +88,34 @@ public class XmlService {
     private Optional<String> packObjToXml(StudentGroup studentGroup) {
         try {
             StringWriter writer = new StringWriter();
-            JAXBContext jaxbContext = JAXBContext.newInstance(StudentGroup.class);
-            Marshaller jaxbMarshller = jaxbContext.createMarshaller();
-            jaxbMarshller.marshal(studentGroup, writer);
+            getJaxbMarshaller(studentGroup.getClass()).marshal(studentGroup, writer);
             return Optional.ofNullable(writer.toString());
         } catch (JAXBException e) {
             e.printStackTrace();
+            return Optional.empty();
         }
-        return Optional.empty();
+    }
+
+    private Marshaller getJaxbMarshaller(Class aClass) throws JAXBException {
+        return getJaxbContext(aClass).createMarshaller();
     }
 
 
     private Optional<StudentGroup> unpackXmlToObjWithJaxb(File file) {
         try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(StudentGroup.class);
-            Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-            return Optional.ofNullable((StudentGroup) jaxbUnmarshaller.unmarshal(file));
+            return Optional.ofNullable((StudentGroup) getJaxbUnmarshaller().unmarshal(file));
         } catch (JAXBException e) {
             e.printStackTrace();
+            return Optional.empty();
         }
-        return Optional.empty();
+    }
+
+    private Unmarshaller getJaxbUnmarshaller() throws JAXBException {
+        return getJaxbContext(StudentGroup.class).createUnmarshaller();
+    }
+
+    private JAXBContext getJaxbContext(Class<StudentGroup> studentGroupClass) throws JAXBException {
+        return JAXBContext.newInstance(studentGroupClass);
     }
 
 }
