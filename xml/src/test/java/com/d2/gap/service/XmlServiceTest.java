@@ -47,7 +47,6 @@ public class XmlServiceTest {
     public void testObjToXmlWithJaxb() throws IOException, TransformerException, ParserConfigurationException {
         initXmlService(ParserType.JAXB);
         service.writeStudentsToXml(expectedStudents);
-
     }
 
 
