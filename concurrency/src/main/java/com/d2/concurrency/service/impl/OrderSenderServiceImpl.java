@@ -1,7 +1,8 @@
-package com.d2.concurrency.service;
+package com.d2.concurrency.service.impl;
 
 import com.d2.concurrency.data.OrderDataBaseStub;
 import com.d2.concurrency.model.TestOrder;
+import com.d2.concurrency.service.OrderSenderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;

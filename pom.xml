@@ -6,6 +6,7 @@
     <modules>
         <module>xml</module>
 		<module>concurrency</module>
+		<module>jmx</module>
 	</modules>
     <parent>
 		<groupId>org.springframework.boot</groupId>
