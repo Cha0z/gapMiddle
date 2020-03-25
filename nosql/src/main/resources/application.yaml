@@ -1,0 +1,14 @@
+spring:
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: local
+
+
+logging:
+  level:
+    root: ERROR
+#       org.springframework.web: ERROR
+#       org.hibernate: ERROR
+
